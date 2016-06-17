@@ -7,7 +7,6 @@ htmlDoc = open('index.html',"r+")
 soup = BeautifulSoup(htmlDoc, "lxml")
 for script in soup.find_all('script'):
     script.decompose()
-
 div = soup.find("div", {"class": "col-md-4"})
 div.decompose()
 div = soup.find("div", {"class": "clearfix mt10"})
@@ -47,7 +46,8 @@ img.decompose()
 discuss = soup.find('h2', {'class' : 'h4 post-comment-title'})
 discuss.decompose()
 for meta in soup.findAll('meta'):
-	meta.decompose()
+	if not meta.has_attr('charset'):
+		meta.decompose()
 for meta in soup.findAll('link'):
         meta.decompose()
 html = soup.prettify("utf-8")
