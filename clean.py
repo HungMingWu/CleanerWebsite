@@ -127,6 +127,51 @@ def removeInfoQCN(soup):
 		meta.decompose()
 	return soup
 
+def removeITEBlog(soup):
+	div_classes = ["navbar", "banner banner-site", "speedbar", "tongji", "QRcode", "comt-title", "relates",
+	"widget widget_text", "no_webshot", "article-social", "related_top", "banner banner-related", "banner banner-comment",
+	"announcement", "meta", "no_bullets"
+	]
+	for divclass in div_classes:
+		for div in soup.findAll("div", {"class": divclass}):
+			div.decompose()
+	div_ides = ["postcomments"]
+	for divid in div_ides:
+		for div in soup.findAll("div", {"id": divid}):
+			div.decompose()
+	for header in soup.findAll("header", {"class": "header"}):
+		header.decompose()
+	aside = soup.find("aside")
+	if aside is not None:
+		aside.decompose()
+	nav = soup.find("nav")
+	if nav is not None:
+		nav.decompose()
+	span = soup.find("span", {"style": "margin-top: 15px; color:red; display:block;text-align:center;"})
+	if span is not None:
+		span.decompose()
+	for footer in soup.findAll("footer"):
+		footer.decompose()
+	return soup
+
+def removeTag(soup, tagname, attribute_name, atribute_value_array):
+	for attribute_value in atribute_value_array:
+		for tag in soup.findAll(tagname, {attribute_name : attribute_value}):
+			tag.decompose()
+	return soup
+
+def removeIBMTag(soup):
+	soup = removeTag(soup, "div", "class", 
+		["dw-home-band", "ibm-access", "ibm-col-6-2 dw-toc-margin", "dw-footer-columns", "ibm-col-6-2",
+	        "ibm-container ibm-alternate ibm-buttons-last", "ibm-common-overlay", "ibm-no-print", "metavalue"])
+	soup = removeTag(soup, "div", "id", 
+		["dw-masthead-top-row", "ibm-masthead", "ibm-footer-module-dwwrapper", "ibm-footer", "ibm-metrics"])
+	soup = removeTag(soup, "ul", "class", ["ibm-portrait-module-list"])
+	soup = removeTag(soup, "ul", "id", ["ibm-navigation-trail"])
+	soup = removeTag(soup, "h2", "class", ["ibm-alternate-rule ibm-no-print"])
+	soup = removeTag(soup, "p", "class", ["ibm-ind-link ibm-back-to-top"])
+	return soup
+
 if len(sys.argv) < 2:
     sys.stderr.write('Usage: clean [url] ')
     sys.exit(1)
@@ -141,6 +186,10 @@ elif "jobbole.com" in url:
 	soup = removeJobboleTag(soup)
 elif "www.infoq.com/cn" in url:
 	soup = removeInfoQCN(soup)
+elif "iteblog" in url:
+	soup = removeITEBlog(soup)
+elif "www.ibm.com/developerworks" in url:
+	soup = removeIBMTag(soup)
 
 html = soup.prettify("utf-8")
 
